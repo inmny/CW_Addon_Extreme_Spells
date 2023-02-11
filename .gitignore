@@ -1,2 +1,8 @@
 .vs
 .git
+*.zip
+*.swp
+bin
+obj
+*.csproj
+*.sln
