@@ -5,12 +5,16 @@ using Cultivation_Way.Actions;
 using Cultivation_Way.Library;
 using Cultivation_Way.Animation;
 using System;
-
+using ReflectionUtility;
 namespace Extreme_Spells.Code
 {
 	[ModEntry]
 	public class Addon_Main_Class : CW_Addon
 	{
+        internal StackEffects stack_effects;
+        internal SmokeController fire_smoke_controller;
+        internal BaseEffectController nuke_controller;
+        internal static Addon_Main_Class instance;
 		public override void awake(){
 			// 不要在此处添加代码，除非你知道你在做什么
 			// DO NOT code here.
@@ -21,8 +25,22 @@ namespace Extreme_Spells.Code
 			// 在这里初始化模组内容
 			// Initalize your mod content here
 			add_spells();
-		}
+            instance = this;
+            stack_effects = MapBox.instance.stackEffects;
+            BaseEffectController base_controller = (BaseEffectController)stack_effects.CallMethod("get", "fireSmoke");
+            fire_smoke_controller = this.gameObject.AddComponent<SmokeController>();
+            fire_smoke_controller.prefab = base_controller.prefab;
+            fire_smoke_controller.setWorld();
+            fire_smoke_controller.prefab.GetComponent<SpriteRenderer>().sortingLayerName = "EffectsTop";
 
+            nuke_controller = (BaseEffectController)stack_effects.CallMethod("get", "explosionNuke");
+
+        }
+
+        public override void update(float elapsed)
+        {
+            fire_smoke_controller.update(elapsed);
+        }
         private void add_spells()
         {
             /**
@@ -31,9 +49,9 @@ namespace Extreme_Spells.Code
 			extreme_fire();
 			extreme_water();
 			extreme_tornado();
-            extreme_meteorolite();
             */
             extreme_void();
+            extreme_meteorolite();
         }
         // 吞噬天地
         private void extreme_void()
@@ -77,16 +95,38 @@ namespace Extreme_Spells.Code
             CW_AnimationSetting anim_setting = new CW_AnimationSetting();
             anim_setting.frame_interval = 0.05f;
             anim_setting.loop_limit_type = AnimationLoopLimitType.TIME_LIMIT;
-            anim_setting.loop_time_limit = 6f;
+            anim_setting.loop_time_limit = 3f;
             anim_setting.layer_name = "Objects";
-            //anim_setting.always_roll = true;
+            anim_setting.always_roll = true;
+            anim_setting.always_roll_axis = new Vector3(0, 0, 1);
+            anim_setting.roll_angle_per_frame = 2000;
             anim_setting.point_to_dst = false;
             anim_setting.anim_froze_frame_idx = -1;
-            anim_setting.trace_grad = 20;
+            anim_setting.trace_grad = 100;
             anim_setting.frame_action = Anim_Actions.extreme_meteorolite_frame;
             anim_setting.end_action = Anim_Actions.extreme_meteorolite_end;
             anim_setting.set_trace(AnimationTraceType.TRACK);
-            //CW_EffectManager.instance.load_as_controller("")
+            CW_EffectManager.instance.load_as_controller("extreme_meteorolite_anim", "effects/extreme_meteorolite/", 10, 1, anim_setting);
+
+            CW_Asset_Spell spell = new CW_Asset_Spell(
+                id: "extreme_meteorolite", anim_id: "extreme_meteorolite_anim",
+                new CW_Element(new int[] { 0, 50, 0, 0, 50 }), element_type_limit: null,
+                rarity: 1, free_val: 1, cost: 0.8f, min_cost: 1000,
+                learn_level: 295, cast_level: 10, can_get_by_random: true,
+                cultisys_black_or_white_list: true, cultisys_list: null,
+                banned_races: null,
+                target_type: CW_Spell_Target_Type.ACTOR,
+                target_camp: CW_Spell_Target_Camp.ENEMY,
+                triger_type: CW_Spell_Triger_Type.ATTACK,
+                anim_type: CW_Spell_Animation_Type.CUSTOM,
+                damage_action: null,
+                anim_action: null,
+                spell_action: Code.Spell_Actions.extreme_meteorolite_spell_action,
+                check_and_cost_action: Cultivation_Way.Actions.CW_SpellAction_Cost.default_check_and_cost
+                );
+            spell.add_tag(CW_Spell_Tag.IMMORTAL);
+            spell.add_tag(CW_Spell_Tag.ATTACK);
+            add_spell(spell);
         }
         // 飓风领域
         private void extreme_tornado()

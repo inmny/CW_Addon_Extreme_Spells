@@ -18,5 +18,15 @@ namespace Extreme_Spells.Code
             if (anim == null) return;
             anim.cost_for_spell = cost;
         }
+
+        internal static void extreme_meteorolite_spell_action(CW_Asset_Spell spell_asset, BaseSimObject pUser, BaseSimObject pTarget, WorldTile pTargetTile, float cost)
+        {
+            if (pUser == null || !pUser.base_data.alive) return;
+            CW_SpriteAnimation anim = CW_EffectManager.instance.spawn_anim(spell_asset.anim_id, pTargetTile.posV+new Vector3(300,500), pTargetTile.posV, pUser, pTarget, Mathf.Log10(cost / 1000));
+            if (anim == null) return;
+            anim.cost_for_spell = cost;
+            anim.set_alpha(0);
+            anim.set_position(pTargetTile.posV + new Vector3(50, 100));
+        }
     }
 }

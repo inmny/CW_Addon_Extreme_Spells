@@ -7,6 +7,7 @@ using Cultivation_Way;
 using Cultivation_Way.Utils;
 using Cultivation_Way.Animation;
 using UnityEngine;
+using ReflectionUtility;
 using Cultivation_Way.Extensions;
 namespace Extreme_Spells.Code
 {
@@ -19,7 +20,7 @@ namespace Extreme_Spells.Code
             if (center == null || anim.src_object == null || !anim.src_object.base_data.alive) { anim.force_stop(false); return; }
 
 
-            List<WorldTile> tiles = CW_SpellHelper.get_circle_tiles(center, (int)Mathf.Log10(anim.cost_for_spell / 1000) * 12);
+            List<WorldTile> tiles = CW_SpellHelper.get_circle_tiles(center, (int)(Mathf.Log10(anim.cost_for_spell / 1000) * 12));
 
             List<BaseSimObject> enemies = CW_SpellHelper.find_enemies_in_tiles(tiles, anim.src_object.kingdom);
             float dist;
@@ -57,7 +58,7 @@ namespace Extreme_Spells.Code
         {
             WorldTile center = MapBox.instance.GetTile((int)src_vec.x, (int)src_vec.y);
             if (center == null || anim.src_object == null || !anim.src_object.base_data.alive) return;
-            List<WorldTile> tiles = CW_SpellHelper.get_circle_tiles(center, (int)Mathf.Log10(anim.cost_for_spell / 1000) * 12);
+            List<WorldTile> tiles = CW_SpellHelper.get_circle_tiles(center, (int)(Mathf.Log10(anim.cost_for_spell / 1000) * 12));
             foreach(WorldTile tile in tiles)
             {
                 MapAction.terraformMain(tile, TileLibrary.pit_deep_ocean, TerraformLibrary.destroy_no_flash);
@@ -70,12 +71,73 @@ namespace Extreme_Spells.Code
 
         internal static void extreme_meteorolite_end(int cur_frame_idx, ref Vector2 src_vec, ref Vector2 dst_vec, CW_SpriteAnimation anim)
         {
-            throw new NotImplementedException();
+            WorldTile center = MapBox.instance.GetTile((int)dst_vec.x, (int)dst_vec.y);
+            if (center == null) return;
+            List<WorldTile> tiles = CW_SpellHelper.get_circle_tiles(center, (int)(Mathf.Log10(anim.cost_for_spell / 1000) * 12));
+
+            List<BaseSimObject> enemies = CW_SpellHelper.find_enemies_in_tiles(tiles, anim.src_object==null?null:anim.src_object.kingdom);
+            float dist;
+            float new_cost;
+            CW_MapChunk chunk;
+            /**
+            foreach (WorldTile tile in tiles)
+            {
+                MapAction.terraformMain(tile, TileLibrary.pit_deep_ocean, TerraformLibrary.destroy_no_flash);
+            }
+            */
+            Addon_Main_Class.instance.nuke_controller.spawnAtRandomScale(center, Mathf.Log10(anim.cost_for_spell) / 5, Mathf.Log10(anim.cost_for_spell) / 5);
+            foreach (BaseSimObject enemy in enemies)
+            {
+                dist = Toolbox.DistVec2Float(dst_vec, enemy.currentPosition);
+
+                chunk = enemy.currentTile.get_cw_chunk();
+
+                new_cost = anim.cost_for_spell / ((1 + dist) * 10f) * Mathf.Pow(chunk.wakan_level,8);
+                chunk.wakan -= CW_Utils_Others.compress_raw_wakan(anim.cost_for_spell / ((1 + dist) * 10f) * (chunk.wakan_level-1), chunk.wakan_level);
+
+                if (chunk.wakan < 0) chunk.wakan = 0;
+
+                CW_SpellHelper.cause_damage_to_target(anim.src_object, enemy, new_cost);
+
+                if (enemy.objectType != MapObjectType.Actor || enemy == anim.src_object) continue;
+
+                if (enemy.base_data.alive)
+                {
+                    ((CW_Actor)enemy).add_force(-(dst_vec.x - enemy.currentPosition.x), -(dst_vec.y - enemy.currentPosition.y), 0.5f);
+                }
+
+            }
         }
 
         internal static void extreme_meteorolite_frame(int cur_frame_idx, ref Vector2 src_vec, ref Vector2 dst_vec, CW_SpriteAnimation anim)
         {
-            throw new NotImplementedException();
+            anim.set_alpha(Mathf.Min(1, anim.renderer.color.a + 0.1f));
+
+            if (anim.loop_nr % 3 == 0) Addon_Main_Class.instance.fire_smoke_controller.spawnSmoke(anim.gameObject.transform.localPosition, anim.get_scale().x);
+
+            if(Mathf.Sqrt(Mathf.Pow(anim.gameObject.transform.localPosition.x - dst_vec.x,2)+ Mathf.Pow(anim.gameObject.transform.localPosition.y - dst_vec.y, 2)) <= anim.get_setting().trace_grad * anim.get_setting().frame_interval && anim.end_froze_time <= 0)
+            {
+                anim.end_froze_time = 1;
+
+                WorldTile center = MapBox.instance.GetTile((int)dst_vec.x, (int)dst_vec.y);
+
+                List<WorldTile> tiles = CW_SpellHelper.get_circle_tiles(center, (int)(Mathf.Log10(anim.cost_for_spell / 1000) * 12));
+                List<BaseSimObject> enemies = CW_SpellHelper.find_enemies_in_tiles(tiles, anim.src_object.kingdom);
+                Debug.LogFormat("Tiles:{0},enemies:{1},cost:{2}", tiles.Count, enemies.Count, anim.cost_for_spell);
+                float dist;
+                foreach (BaseSimObject enemy in enemies)
+                {
+                    dist = Toolbox.DistVec2Float(dst_vec, enemy.currentPosition);
+                    CW_SpellHelper.cause_damage_to_target(anim.src_object, enemy, anim.cost_for_spell / ((1 + dist) * 10f));
+                    if (enemy.objectType != MapObjectType.Actor || enemy == anim.src_object) continue;
+
+                    if (enemy.base_data.alive)
+                    {
+                        ((CW_Actor)enemy).add_force(-(dst_vec.x - enemy.currentPosition.x) * 0.1f, -(dst_vec.y - enemy.currentPosition.y) * 0.1f, 0.05f);
+                    }
+
+                }
+            }
         }
     }
 }
