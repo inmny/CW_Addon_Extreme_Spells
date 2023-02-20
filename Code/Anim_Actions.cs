@@ -13,6 +13,7 @@ namespace Extreme_Spells.Code
 {
     internal static class Anim_Actions
     {
+        private static TerraformOptions tmp_terraform_options;
         public static void extreme_void_frame(int cur_frame_idx, ref Vector2 src_vec, ref Vector2 dst_vec, CW_SpriteAnimation anim)
         {
             if (cur_frame_idx == 17) anim.cur_frame_idx = 6;
@@ -166,6 +167,132 @@ namespace Extreme_Spells.Code
 
                 }
             }
+        }
+
+        internal static void extreme_fire_end(int cur_frame_idx, ref Vector2 src_vec, ref Vector2 dst_vec, CW_SpriteAnimation anim)
+        {
+            //throw new NotImplementedException();
+            
+        }
+
+        internal static void extreme_fire_frame(int cur_frame_idx, ref Vector2 src_vec, ref Vector2 dst_vec, CW_SpriteAnimation anim)
+        {
+            bool valid = false;
+            // 采用end_froze_time>0作为落地标识
+            if (anim.end_froze_time<=0 && Mathf.Sqrt(Mathf.Pow(anim.gameObject.transform.localPosition.x - dst_vec.x, 2) + Mathf.Pow(anim.gameObject.transform.localPosition.y - dst_vec.y, 2)) > anim.get_setting().trace_grad * anim.get_setting().frame_interval)
+            {
+                if(Toolbox.randomChance(0.2f)) anim.set_position(new Vector3(anim.dst_vec.x + Toolbox.randomFloat(-1f, 1f), anim.gameObject.transform.localPosition.y));
+            }
+            else
+            {
+                if (anim.end_froze_time <= 0)
+                {
+                    if (Toolbox.randomChance(0.26f))
+                    {
+                        for (int i = 0; i < 4; i++)
+                        {
+                            Vector2 new_dst = new Vector3(dst_vec.x + Toolbox.randomFloat(-5f, 5f), dst_vec.y + Toolbox.randomFloat(-5f, 5f));
+                            CW_SpriteAnimation new_anim = CW_EffectManager.instance.spawn_anim("extreme_fire_anim", new_dst + new Vector2(0, 50 + Toolbox.randomFloat(-25f, 12f)), new_dst, anim.src_object, null, 1);
+
+                            if (new_anim != null)
+                            {
+                                valid = true;
+                                new_anim.cost_for_spell = anim.cost_for_spell;
+                                new_anim.cur_frame_idx = Toolbox.randomInt(0, 3);
+                            }
+                        }
+                    }
+                    anim.end_froze_time = 1;
+                }
+
+
+                anim.next_frame_time -= Toolbox.randomFloat(0, anim.next_frame_time / 5f);
+
+                WorldTile tile = MapBox.instance.GetTile((int)anim.gameObject.transform.localPosition.x, (int)anim.gameObject.transform.localPosition.y);
+                if (tile == null) return;
+                if(anim.src_object!=null&&(tmp_terraform_options == null||tmp_terraform_options.id != anim.src_object.name))
+                {
+                    tmp_terraform_options = new TerraformOptions
+                    {
+                        id = anim.src_object.name,
+                        removeBorders = true,
+                        removeBurned = false,
+                        removeBuilding = true,
+                        removeFrozen = true,
+                        removeLava = false,
+                        removeRoads = true,
+                        removeRuins = true,
+                        removeTopTile = true,
+                        removeTornado = false,
+                        removeTreesFully = true,
+                        removeWater = true,
+                        destroyBuildings = true,
+                        addBurned = true,
+                        addHeat = 2,
+                        applies_to_high_flyers = true,
+                        damage = 0,
+                        explode_and_set_random_fire = false,
+                        explode_strength = 0,
+                        explode_tile = false,
+                        explosion_pixel_effect = false,
+                        flash = false,
+                        ignoreKingdoms = new string[] { anim.src_object.kingdom.id },
+                        setFire = true
+                    };
+                }
+
+                if (Toolbox.randomChance(0.1f)) {
+                    tile.setBurned();
+                    MapAction.terraformMain(tile, tile.main_type.ground ? AssetManager.tiles.get("sand") : tile.main_type, tmp_terraform_options); 
+                }
+                foreach (WorldTile near_tile in tile.neighboursAll)
+                {
+                    if (Toolbox.randomChance(0.1f))
+                    {
+                        near_tile.setBurned();
+                        MapAction.terraformMain(near_tile, near_tile.main_type.ground ? AssetManager.tiles.get("sand") : near_tile.main_type, tmp_terraform_options);
+                    }
+                }
+
+                CW_MapChunk chunk = tile.get_cw_chunk();
+
+                if (chunk.wakan <= 100) anim.force_stop(true);
+
+                float cost = anim.cost_for_spell * CW_Utils_Others.get_raw_wakan(chunk.wakan * 0.001f, chunk.wakan_level)*10;
+                foreach(CW_Actor unit in tile.units)
+                {
+                    if (unit.fast_data.alive && unit != anim.src_object && CW_SpellHelper.is_enemy(unit, anim.src_object))
+                    {
+                        valid = true;
+                        unit.get_hit(cost, true, Cultivation_Way.Others.CW_Enums.CW_AttackType.Spell, anim.src_object, false);
+                        ActionLibrary.addBurningEffectOnTarget(unit, tile);
+                    }
+                }
+                foreach(WorldTile near_tile in tile.neighboursAll)
+                {
+                    foreach (CW_Actor unit in near_tile.units)
+                    {
+                        if (unit.fast_data.alive && unit != anim.src_object && CW_SpellHelper.is_enemy(unit, anim.src_object))
+                        {
+                            valid = true;
+                            unit.get_hit(cost, true, Cultivation_Way.Others.CW_Enums.CW_AttackType.Spell, anim.src_object, false);
+                            ActionLibrary.addBurningEffectOnTarget(unit, near_tile);
+                        }
+                    }
+                }
+
+                if (valid)
+                {
+                    chunk.wakan *= 0.999f;
+                    chunk.update(true);
+                }
+                else
+                {
+                    chunk.wakan *= 0.9999f;
+                    chunk.update(true);
+                }
+            }
+
         }
     }
 }

@@ -40,7 +40,7 @@ namespace Extreme_Spells.Code
                     tile.delayedBombType = "";
                     List<List<BaseSimObject>> enemies = CW_SpellHelper.find_kingdom_enemies_in_chunk(tile.chunk, user == null ? null : user.kingdom);
                     Addon_Main_Class.instance.bomb_controller.spawnAtRandomScale(tile, 0.45f, 0.6f);
-                    if(Toolbox.randomChance(0.001f))UnityEngine.Debug.LogFormat("Damage:{0},units_count:{1}", damage,tile.units.Count);
+                    //if(Toolbox.randomChance(0.001f))UnityEngine.Debug.LogFormat("Damage:{0},units_count:{1}", damage,tile.units.Count);
                     foreach(List<BaseSimObject> list in enemies)
                     {
                         foreach(BaseSimObject enemy in list)

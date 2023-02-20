@@ -162,7 +162,38 @@ namespace Extreme_Spells.Code
         // 天火焚世
         private void extreme_fire()
         {
-            throw new NotImplementedException();
+            CW_AnimationSetting anim_setting = new CW_AnimationSetting();
+            anim_setting.frame_interval = 0.3f;
+            anim_setting.loop_limit_type = AnimationLoopLimitType.TIME_LIMIT;
+            anim_setting.loop_time_limit = 10f;
+            anim_setting.layer_name = "EffectsTop";
+            anim_setting.point_to_dst = false;
+            anim_setting.anim_froze_frame_idx = -1;
+            anim_setting.trace_grad = 15;
+            anim_setting.frame_action = Anim_Actions.extreme_fire_frame;
+            anim_setting.end_action = Anim_Actions.extreme_fire_end;
+            anim_setting.set_trace(AnimationTraceType.TRACK);
+            CW_EffectManager.instance.load_as_controller("extreme_fire_anim", "drops/drop_fire/", 10000, 0.2f, anim_setting);
+
+            CW_Asset_Spell spell = new CW_Asset_Spell(
+                id: "extreme_fire", anim_id: "extreme_fire_anim",
+                new CW_Element(new int[] { 0, 100, 0, 0, 0 }), element_type_limit: null,
+                rarity: 295, free_val: 1, cost: 0.8f, min_cost: 1000,
+                learn_level: 10, cast_level: 10, can_get_by_random: true,
+                cultisys_black_or_white_list: true, cultisys_list: null,
+                banned_races: null,
+                target_type: CW_Spell_Target_Type.ACTOR,
+                target_camp: CW_Spell_Target_Camp.ENEMY,
+                triger_type: CW_Spell_Triger_Type.ATTACK,
+                anim_type: CW_Spell_Animation_Type.CUSTOM,
+                damage_action: null,
+                anim_action: null,
+                spell_action: Code.Spell_Actions.extreme_fire_spell_action,
+                check_and_cost_action: Cultivation_Way.Actions.CW_SpellAction_Cost.default_check_and_cost
+                );
+            spell.add_tag(CW_Spell_Tag.IMMORTAL);
+            spell.add_tag(CW_Spell_Tag.ATTACK);
+            add_spell(spell);
         }
         // 飓风领域
         private void extreme_tornado()
