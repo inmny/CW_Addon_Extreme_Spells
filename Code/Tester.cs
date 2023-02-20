@@ -14,11 +14,19 @@ namespace Extreme_Spells.Code
         {
             extreme_meteorolite();
         }
+        private static void default_extreme_fire()
+        {
+            extreme_fire();
+        }
         private static void extreme_meteorolite(string src = "u_0", string dst = "u_1", float cost = 20000000)
         {
             force_spell("extreme_meteorolite", src, dst, cost);
         }
-        private static bool force_spell(string spell_id, string src_id, string dst_id, float cost)
+        private static void extreme_fire(string src = "u_0", string dst = "u_1", float cost = 20000000)
+        {
+            force_spell("extreme_fire", src, dst, cost);
+        }
+        private static bool force_spell(string spell_id, string src_id = "u_0", string dst_id = "u_1", float cost = 20000000)
         {
             CW_Asset_Spell spell_asset = CW_Library_Manager.instance.spells.get(spell_id);
             Actor src_actor = MapBox.instance.getActorByID(src_id);
