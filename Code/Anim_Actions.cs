@@ -76,30 +76,58 @@ namespace Extreme_Spells.Code
             List<WorldTile> tiles = CW_SpellHelper.get_circle_tiles(center, (int)(Mathf.Log10(anim.cost_for_spell / 1000) * 12));
 
             List<BaseSimObject> enemies = CW_SpellHelper.find_enemies_in_tiles(tiles, anim.src_object==null?null:anim.src_object.kingdom);
+
             float dist;
             float new_cost;
             CW_MapChunk chunk;
-            /**
-            foreach (WorldTile tile in tiles)
+            float base_cost = anim.cost_for_spell * anim.cost_for_spell;
+            if ((anim.src_object != null && anim.src_object.objectType == MapObjectType.Actor))
             {
-                MapAction.terraformMain(tile, TileLibrary.pit_deep_ocean, TerraformLibrary.destroy_no_flash);
+                CW_Actor _tmp_actor = (CW_Actor)anim.src_object;
+                Pair<CW_Actor, int> count;
+                if (!Addon_Main_Class.instance.tmp_actors.TryGetValue(_tmp_actor.fast_data.actorID, out count))
+                {
+                    count = new Pair<CW_Actor, int>(_tmp_actor, 0);
+                    Addon_Main_Class.instance.tmp_actors[_tmp_actor.fast_data.actorID] = count;
+                }
+                count.Value += tiles.Count;
+
+                foreach (WorldTile tile in tiles)
+                {
+                    MapAction.terraformMain(tile, TileLibrary.pit_deep_ocean, TerraformLibrary.destroy_no_flash);
+
+                    chunk = tile.get_cw_chunk();
+                    if (chunk.wakan <= 0) { count.Value--; continue; }
+
+                    MapBox.instance.dropManager.spawnBurstPixel(tile, "extreme_meteorolite_drop", 0, 2, 0, -1);
+
+                    tile.delayedTimerBomb = anim.cost_for_spell/10 + CW_Utils_Others.get_raw_wakan(chunk.wakan*0.2f, chunk.wakan_level);
+
+                    tile.delayedBombType = _tmp_actor.fast_data.actorID;
+
+                    chunk.wakan *= 0.8f;
+
+                    if (chunk.wakan < 1) chunk.wakan = 0;
+                }
+
             }
-            */
-            Addon_Main_Class.instance.nuke_controller.spawnAtRandomScale(center, Mathf.Log10(anim.cost_for_spell) / 5, Mathf.Log10(anim.cost_for_spell) / 5);
+            
+            BaseEffect nuke_explosion = Addon_Main_Class.instance.nuke_controller.spawnAtRandomScale(center, Mathf.Log10(anim.cost_for_spell) / 10f, Mathf.Log10(anim.cost_for_spell) / 10f);
+            nuke_explosion.transform.localPosition = new Vector3(nuke_explosion.transform.localPosition.x, nuke_explosion.transform.localPosition.y + 3);
+
             foreach (BaseSimObject enemy in enemies)
             {
+                if (enemy == anim.src_object) continue;
+
                 dist = Toolbox.DistVec2Float(dst_vec, enemy.currentPosition);
 
                 chunk = enemy.currentTile.get_cw_chunk();
 
-                new_cost = anim.cost_for_spell / ((1 + dist) * 10f) * Mathf.Pow(chunk.wakan_level,8);
-                chunk.wakan -= CW_Utils_Others.compress_raw_wakan(anim.cost_for_spell / ((1 + dist) * 10f) * (chunk.wakan_level-1), chunk.wakan_level);
-
-                if (chunk.wakan < 0) chunk.wakan = 0;
+                new_cost = anim.cost_for_spell*81 / (5 + dist);
 
                 CW_SpellHelper.cause_damage_to_target(anim.src_object, enemy, new_cost);
 
-                if (enemy.objectType != MapObjectType.Actor || enemy == anim.src_object) continue;
+                if (enemy.objectType != MapObjectType.Actor) continue;
 
                 if (enemy.base_data.alive)
                 {
@@ -123,12 +151,12 @@ namespace Extreme_Spells.Code
 
                 List<WorldTile> tiles = CW_SpellHelper.get_circle_tiles(center, (int)(Mathf.Log10(anim.cost_for_spell / 1000) * 12));
                 List<BaseSimObject> enemies = CW_SpellHelper.find_enemies_in_tiles(tiles, anim.src_object.kingdom);
-                Debug.LogFormat("Tiles:{0},enemies:{1},cost:{2}", tiles.Count, enemies.Count, anim.cost_for_spell);
+                //Debug.LogFormat("Tiles:{0},enemies:{1},cost:{2}", tiles.Count, enemies.Count, anim.cost_for_spell);
                 float dist;
                 foreach (BaseSimObject enemy in enemies)
                 {
                     dist = Toolbox.DistVec2Float(dst_vec, enemy.currentPosition);
-                    CW_SpellHelper.cause_damage_to_target(anim.src_object, enemy, anim.cost_for_spell / ((1 + dist) * 10f));
+                    CW_SpellHelper.cause_damage_to_target(anim.src_object, enemy, anim.cost_for_spell / (5 + dist*3f));
                     if (enemy.objectType != MapObjectType.Actor || enemy == anim.src_object) continue;
 
                     if (enemy.base_data.alive)

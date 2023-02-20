@@ -6,14 +6,34 @@ using Cultivation_Way.Library;
 using Cultivation_Way.Animation;
 using System;
 using ReflectionUtility;
+using System.Collections.Generic;
+
 namespace Extreme_Spells.Code
 {
+    internal class Pair<TI, TF>
+    {
+        public TI Key { get; }
+        public TF Value { get; set; }
+        public Pair(TI Key, TF Value){
+            this.Key = Key;
+            this.Value = Value;
+        }
+    }
+    internal class Simple_SmokeController : SmokeController
+    {
+        public override void spawn()
+        {
+            return;
+        }
+    }
 	[ModEntry]
 	public class Addon_Main_Class : CW_Addon
 	{
         internal StackEffects stack_effects;
-        internal SmokeController fire_smoke_controller;
+        internal Simple_SmokeController fire_smoke_controller;
         internal BaseEffectController nuke_controller;
+        internal BaseEffectController bomb_controller;
+        internal Dictionary<string, Pair<CW_Actor, int>> tmp_actors;
         internal static Addon_Main_Class instance;
 		public override void awake(){
 			// 不要在此处添加代码，除非你知道你在做什么
@@ -22,19 +42,29 @@ namespace Extreme_Spells.Code
 		}
 		public override void initialize(){
 			Log("添加超级法术!");
-			// 在这里初始化模组内容
-			// Initalize your mod content here
+            // 在这里初始化模组内容
+            // Initalize your mod content here
+            Drops.add_drops();
 			add_spells();
             instance = this;
             stack_effects = MapBox.instance.stackEffects;
+            // 获取原版烟效果
             BaseEffectController base_controller = (BaseEffectController)stack_effects.CallMethod("get", "fireSmoke");
-            fire_smoke_controller = this.gameObject.AddComponent<SmokeController>();
-            fire_smoke_controller.prefab = base_controller.prefab;
+
+            GameObject effects = new GameObject("effects");
+            effects.transform.SetParent(this.transform);
+            GameObject fire_smoke = new GameObject("fire_smokes");
+            fire_smoke.transform.SetParent(effects.transform);
+
+            fire_smoke_controller = fire_smoke.AddComponent<Simple_SmokeController>();
+            fire_smoke_controller.prefab = GameObject.Instantiate(base_controller.prefab,fire_smoke_controller.transform);
             fire_smoke_controller.setWorld();
             fire_smoke_controller.prefab.GetComponent<SpriteRenderer>().sortingLayerName = "EffectsTop";
-
+            // 获取原版核弹、炸弹效果
             nuke_controller = (BaseEffectController)stack_effects.CallMethod("get", "explosionNuke");
+            bomb_controller = (BaseEffectController)stack_effects.CallMethod("get", "explosionSmall");
 
+            tmp_actors = new Dictionary<string, Pair<CW_Actor, int>>();
         }
 
         public override void update(float elapsed)
@@ -46,11 +76,12 @@ namespace Extreme_Spells.Code
             /**
 			gold_sword_a();
 			gold_sword_b();
-			extreme_fire();
 			extreme_water();
 			extreme_tornado();
             */
+
             extreme_void();
+            extreme_fire();
             extreme_meteorolite();
         }
         // 吞噬天地
@@ -72,8 +103,8 @@ namespace Extreme_Spells.Code
             CW_Asset_Spell spell = new CW_Asset_Spell(
                 id: "extreme_void", anim_id: "extreme_void_anim",
                 new CW_Element(new int[] { 20, 20, 20, 20, 20 }), element_type_limit: null,
-                rarity: 1, free_val: 1, cost: 0.98f, min_cost: 1000,
-                learn_level: 295, cast_level: 10, can_get_by_random: true,
+                rarity: 295, free_val: 1, cost: 0.98f, min_cost: 1000,
+                learn_level: 10, cast_level: 10, can_get_by_random: true,
                 cultisys_black_or_white_list: true, cultisys_list: null,
                 banned_races: null,
                 target_type: CW_Spell_Target_Type.ACTOR,
@@ -111,8 +142,8 @@ namespace Extreme_Spells.Code
             CW_Asset_Spell spell = new CW_Asset_Spell(
                 id: "extreme_meteorolite", anim_id: "extreme_meteorolite_anim",
                 new CW_Element(new int[] { 0, 50, 0, 0, 50 }), element_type_limit: null,
-                rarity: 1, free_val: 1, cost: 0.8f, min_cost: 1000,
-                learn_level: 295, cast_level: 10, can_get_by_random: true,
+                rarity: 295, free_val: 1, cost: 0.8f, min_cost: 1000,
+                learn_level: 10, cast_level: 10, can_get_by_random: true,
                 cultisys_black_or_white_list: true, cultisys_list: null,
                 banned_races: null,
                 target_type: CW_Spell_Target_Type.ACTOR,
@@ -128,6 +159,11 @@ namespace Extreme_Spells.Code
             spell.add_tag(CW_Spell_Tag.ATTACK);
             add_spell(spell);
         }
+        // 天火焚世
+        private void extreme_fire()
+        {
+            throw new NotImplementedException();
+        }
         // 飓风领域
         private void extreme_tornado()
         {
@@ -135,11 +171,6 @@ namespace Extreme_Spells.Code
         }
         // 天河之水
         private void extreme_water()
-        {
-            throw new NotImplementedException();
-        }
-        // 天火焚世
-        private void extreme_fire()
         {
             throw new NotImplementedException();
         }
