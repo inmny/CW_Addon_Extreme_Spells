@@ -172,22 +172,62 @@ namespace Extreme_Spells.Code
         internal static void extreme_fire_end(int cur_frame_idx, ref Vector2 src_vec, ref Vector2 dst_vec, CW_SpriteAnimation anim)
         {
             //throw new NotImplementedException();
-            
+            WorldTile tile = MapBox.instance.GetTile((int)anim.gameObject.transform.localPosition.x, (int)anim.gameObject.transform.localPosition.y);
+            if (tile == null) return;
+            if (Toolbox.randomChance(0.99f)) return;
+
+            if (anim.src_object != null && (tmp_terraform_options == null || tmp_terraform_options.id != anim.src_object.name))
+            {
+                tmp_terraform_options = new TerraformOptions
+                {
+                    id = anim.src_object.name,
+                    removeBorders = true,
+                    removeBurned = false,
+                    removeBuilding = true,
+                    removeFrozen = true,
+                    removeLava = false,
+                    removeRoads = true,
+                    removeRuins = true,
+                    removeTopTile = true,
+                    removeTornado = false,
+                    removeTreesFully = true,
+                    removeWater = true,
+                    destroyBuildings = true,
+                    addBurned = true,
+                    addHeat = 2,
+                    applies_to_high_flyers = true,
+                    damage = 0,
+                    explode_and_set_random_fire = false,
+                    explode_strength = 0,
+                    explode_tile = false,
+                    explosion_pixel_effect = false,
+                    flash = false,
+                    ignoreKingdoms = new string[] { anim.src_object.kingdom.id },
+                    setFire = true
+                };
+            }
+            MapAction.terraformMain(tile, tile.main_type.ground ? AssetManager.tiles.get("sand") : tile.main_type, tmp_terraform_options);
         }
 
         internal static void extreme_fire_frame(int cur_frame_idx, ref Vector2 src_vec, ref Vector2 dst_vec, CW_SpriteAnimation anim)
         {
             bool valid = false;
             // 采用end_froze_time>0作为落地标识
-            if (anim.end_froze_time<=0 && Mathf.Sqrt(Mathf.Pow(anim.gameObject.transform.localPosition.x - dst_vec.x, 2) + Mathf.Pow(anim.gameObject.transform.localPosition.y - dst_vec.y, 2)) > anim.get_setting().trace_grad * anim.get_setting().frame_interval)
+            if (anim.end_froze_time <= 0 && Mathf.Sqrt(Mathf.Pow(anim.gameObject.transform.localPosition.x - dst_vec.x, 2) + Mathf.Pow(anim.gameObject.transform.localPosition.y - dst_vec.y, 2)) > anim.get_setting().trace_grad * anim.get_setting().frame_interval)
             {
-                if(Toolbox.randomChance(0.2f)) anim.set_position(new Vector3(anim.dst_vec.x + Toolbox.randomFloat(-1f, 1f), anim.gameObject.transform.localPosition.y));
+                if (Toolbox.randomChance(0.5f)) anim.set_position(new Vector3(anim.dst_vec.x + Toolbox.randomFloat(-0.1f, 0.1f), anim.gameObject.transform.localPosition.y));
             }
             else
             {
+
+                WorldTile tile = MapBox.instance.GetTile((int)anim.gameObject.transform.localPosition.x, (int)anim.gameObject.transform.localPosition.y);
+                if (tile == null) return;
+
+                CW_MapChunk chunk = tile.get_cw_chunk();
+
                 if (anim.end_froze_time <= 0)
                 {
-                    if (Toolbox.randomChance(0.26f))
+                    if (Toolbox.randomChance(0.255f) && chunk.wakan >= 120)
                     {
                         for (int i = 0; i < 4; i++)
                         {
@@ -208,9 +248,7 @@ namespace Extreme_Spells.Code
 
                 anim.next_frame_time -= Toolbox.randomFloat(0, anim.next_frame_time / 5f);
 
-                WorldTile tile = MapBox.instance.GetTile((int)anim.gameObject.transform.localPosition.x, (int)anim.gameObject.transform.localPosition.y);
-                if (tile == null) return;
-                if(anim.src_object!=null&&(tmp_terraform_options == null||tmp_terraform_options.id != anim.src_object.name))
+                if (anim.src_object != null && (tmp_terraform_options == null || tmp_terraform_options.id != anim.src_object.name))
                 {
                     tmp_terraform_options = new TerraformOptions
                     {
@@ -241,25 +279,22 @@ namespace Extreme_Spells.Code
                     };
                 }
 
-                if (Toolbox.randomChance(0.1f)) {
+                if (Toolbox.randomChance(0.4f))
+                {
                     tile.setBurned();
-                    MapAction.terraformMain(tile, tile.main_type.ground ? AssetManager.tiles.get("sand") : tile.main_type, tmp_terraform_options); 
+                    MapAction.terraformMain(tile, tile.main_type.ground ? AssetManager.tiles.get("sand") : tile.main_type, tmp_terraform_options);
                 }
                 foreach (WorldTile near_tile in tile.neighboursAll)
                 {
-                    if (Toolbox.randomChance(0.1f))
+                    if (Toolbox.randomChance(0.2f))
                     {
                         near_tile.setBurned();
                         MapAction.terraformMain(near_tile, near_tile.main_type.ground ? AssetManager.tiles.get("sand") : near_tile.main_type, tmp_terraform_options);
                     }
                 }
 
-                CW_MapChunk chunk = tile.get_cw_chunk();
-
-                if (chunk.wakan <= 100) anim.force_stop(true);
-
-                float cost = anim.cost_for_spell * CW_Utils_Others.get_raw_wakan(chunk.wakan * 0.001f, chunk.wakan_level)*10;
-                foreach(CW_Actor unit in tile.units)
+                float cost = anim.cost_for_spell * CW_Utils_Others.get_raw_wakan(chunk.wakan * 0.001f, chunk.wakan_level) * 10;
+                foreach (CW_Actor unit in tile.units)
                 {
                     if (unit.fast_data.alive && unit != anim.src_object && CW_SpellHelper.is_enemy(unit, anim.src_object))
                     {
@@ -268,7 +303,7 @@ namespace Extreme_Spells.Code
                         ActionLibrary.addBurningEffectOnTarget(unit, tile);
                     }
                 }
-                foreach(WorldTile near_tile in tile.neighboursAll)
+                foreach (WorldTile near_tile in tile.neighboursAll)
                 {
                     foreach (CW_Actor unit in near_tile.units)
                     {
@@ -280,19 +315,83 @@ namespace Extreme_Spells.Code
                         }
                     }
                 }
-
-                if (valid)
+                if (chunk.wakan > 0)
                 {
-                    chunk.wakan *= 0.999f;
-                    chunk.update(true);
-                }
-                else
-                {
-                    chunk.wakan *= 0.9999f;
-                    chunk.update(true);
+                    if (valid)
+                    {
+                        chunk.wakan -= Mathf.Max(0.1f, 0.001f * chunk.wakan);
+                        chunk.update(true);
+                    }
+                    else
+                    {
+                        chunk.wakan -= Mathf.Max(0.1f, 0.0001f * chunk.wakan);
+                        chunk.update(true);
+                    }
                 }
             }
 
         }
+        internal static void extreme_gold_sword_b_end(int cur_frame_idx, ref Vector2 src_vec, ref Vector2 dst_vec, CW_SpriteAnimation anim)
+        {
+            WorldTile tile = MapBox.instance.GetTile((int)anim.gameObject.transform.localPosition.x, (int)anim.gameObject.transform.localPosition.y);
+            if (tile == null) return;
+            //throw new NotImplementedException();
+            if (Toolbox.randomChance(0.48f))
+            {
+                CW_SpriteAnimation new_anim = CW_EffectManager.instance.spawn_anim("gold_sword_b_anim", src_vec, dst_vec, anim.src_object, null, 1);
+
+                if (new_anim != null)
+                {
+                    new_anim.cost_for_spell = anim.cost_for_spell;
+                }
+            }
+            else
+            {
+                //MapBox.instance.dropManager.spawnBurstPixel(tile, "extreme_gold_drop", 0.2f, Toolbox.randomFloat(0.5f + anim.get_scale().x, anim.get_scale().x), 0);
+            }
+            
+            float damage = anim.cost_for_spell * anim.get_scale().x;
+            foreach (CW_Actor unit in tile.units)
+            {
+                if (unit.fast_data.alive && unit != anim.src_object && CW_SpellHelper.is_enemy(unit, anim.src_object))
+                {
+                    unit.get_hit(damage, true, Cultivation_Way.Others.CW_Enums.CW_AttackType.God, anim.src_object, false);
+                    if (unit.fast_data.alive)
+                    {
+                        CW_SpriteAnimation new_anim = CW_EffectManager.instance.spawn_anim("gold_sword_b_anim", src_vec, dst_vec, anim.src_object, null, 1);
+
+                        if (new_anim != null)
+                        {
+                            new_anim.cost_for_spell = anim.cost_for_spell;
+                        }
+                    }
+                }
+            }
+            foreach (WorldTile near_tile in tile.neighboursAll)
+            {
+                foreach (CW_Actor unit in near_tile.units)
+                {
+                    if (unit.fast_data.alive && unit != anim.src_object && CW_SpellHelper.is_enemy(unit, anim.src_object))
+                    {
+                        unit.get_hit(damage / 3, true, Cultivation_Way.Others.CW_Enums.CW_AttackType.God, anim.src_object, false);
+                        if (unit.fast_data.alive)
+                        {
+                            CW_SpriteAnimation new_anim = CW_EffectManager.instance.spawn_anim("gold_sword_b_anim", src_vec, dst_vec, anim.src_object, null, 1);
+
+                            if (new_anim != null)
+                            {
+                                new_anim.cost_for_spell = anim.cost_for_spell;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        internal static void extreme_gold_sword_b_frame(int cur_frame_idx, ref Vector2 src_vec, ref Vector2 dst_vec, CW_SpriteAnimation anim)
+        {
+            //throw new NotImplementedException();
+        }
+
     }
 }

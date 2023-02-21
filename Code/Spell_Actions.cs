@@ -35,11 +35,11 @@ namespace Extreme_Spells.Code
             if (pUser == null || !pUser.base_data.alive) return;
             float radius = Mathf.Log10(cost)*3;
             List<WorldTile> tiles = CW_SpellHelper.get_circle_tiles(pTargetTile, radius);
-            Debug.Log(tiles.Count);
+            //Debug.Log(tiles.Count);
             foreach(WorldTile tile in tiles)
             {
                 if (Toolbox.randomChance(0.6f)) continue;
-                CW_SpriteAnimation anim = CW_EffectManager.instance.spawn_anim(spell_asset.anim_id, tile.posV+new Vector3(0,50+Toolbox.randomFloat(-25f,12f)), tile.posV, pUser, null, 1);
+                CW_SpriteAnimation anim = CW_EffectManager.instance.spawn_anim(spell_asset.anim_id, tile.posV+new Vector3(0,Toolbox.randomFloat(25f,62f)), tile.posV, pUser, null, 1);
                 if (anim == null) { Debug.Log("Fail to spawn anim"); return; }
 
                 anim.cost_for_spell = Mathf.Sqrt(cost);
@@ -47,6 +47,27 @@ namespace Extreme_Spells.Code
                 //anim.set_alpha(0);
                 //anim.set_position(tile.posV + new Vector3(0, 50));
                 //Debug.Log(anim.gameObject.transform.localPosition);
+            }
+        }
+
+        internal static void extreme_gold_sword_b_spell_action(CW_Asset_Spell spell_asset, BaseSimObject pUser, BaseSimObject pTarget, WorldTile pTargetTile, float cost)
+        {
+            if (pUser == null || !pUser.base_data.alive) return;
+            float radius = Mathf.Log10(cost) * 3;
+            List<WorldTile> tiles = CW_SpellHelper.get_circle_tiles(pTargetTile, radius);
+            //Debug.Log(tiles.Count);
+            foreach (WorldTile tile in tiles)
+            {
+                //if (Toolbox.randomChance(0.6f)) continue;
+                int count = (int)(Mathf.Sqrt(radius - Toolbox.DistTile(pTargetTile, tile)));
+                while (count-- > 0)
+                {
+                    CW_SpriteAnimation anim = CW_EffectManager.instance.spawn_anim(spell_asset.anim_id, new Vector3(tile.posV.x, tile.posV.y + Toolbox.randomFloat(10f, 40f)), tile.posV, pUser, null, 1);
+                    if (anim == null) { Debug.Log("Fail to spawn anim"); return; }
+
+                    anim.cost_for_spell = radius * radius;
+                    anim.cur_frame_idx = 0;
+                }
             }
         }
     }

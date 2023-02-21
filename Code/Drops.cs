@@ -51,6 +51,18 @@ namespace Extreme_Spells.Code
                     }
                 })
             });
+            AssetManager.drops.add(new DropAsset
+            {
+                id = "extreme_gold_drop",
+                path_texture = "drops/drop_lava",
+                animated = true,
+                animation_speed = 0.03f,
+                default_scale = 0.5f,
+                random_frame = true,
+                random_flip = true,
+                fallingHeight = new UnityEngine.Vector2(10f, 15f),
+                fallingSpeed = 3f
+            });
         }
     }
 }

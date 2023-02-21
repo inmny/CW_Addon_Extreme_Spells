@@ -60,6 +60,7 @@ namespace Extreme_Spells.Code
             fire_smoke_controller.prefab = GameObject.Instantiate(base_controller.prefab,fire_smoke_controller.transform);
             fire_smoke_controller.setWorld();
             fire_smoke_controller.prefab.GetComponent<SpriteRenderer>().sortingLayerName = "EffectsTop";
+            fire_smoke_controller.prefab.transform.localPosition = new Vector3(-1000, -1000);
             // 获取原版核弹、炸弹效果
             nuke_controller = (BaseEffectController)stack_effects.CallMethod("get", "explosionNuke");
             bomb_controller = (BaseEffectController)stack_effects.CallMethod("get", "explosionSmall");
@@ -74,8 +75,7 @@ namespace Extreme_Spells.Code
         private void add_spells()
         {
             /**
-			gold_sword_a();
-			gold_sword_b();
+            gold_sword_a();
 			extreme_water();
 			extreme_tornado();
             */
@@ -83,6 +83,7 @@ namespace Extreme_Spells.Code
             extreme_void();
             extreme_fire();
             extreme_meteorolite();
+            gold_sword_b();
         }
         // 吞噬天地
         private void extreme_void()
@@ -166,7 +167,7 @@ namespace Extreme_Spells.Code
             anim_setting.frame_interval = 0.3f;
             anim_setting.loop_limit_type = AnimationLoopLimitType.TIME_LIMIT;
             anim_setting.loop_time_limit = 10f;
-            anim_setting.layer_name = "EffectsTop";
+            anim_setting.layer_name = "Objects";
             anim_setting.point_to_dst = false;
             anim_setting.anim_froze_frame_idx = -1;
             anim_setting.trace_grad = 15;
@@ -195,6 +196,44 @@ namespace Extreme_Spells.Code
             spell.add_tag(CW_Spell_Tag.ATTACK);
             add_spell(spell);
         }
+        // 金光剑阵
+        private void gold_sword_b()
+        {
+            CW_AnimationSetting anim_setting = new CW_AnimationSetting();
+            anim_setting.frame_interval = 1f;
+            anim_setting.loop_limit_type = AnimationLoopLimitType.DST_LIMIT;
+            anim_setting.layer_name = "Objects";
+            anim_setting.point_to_dst = true;
+            anim_setting.always_point_to_dst = true;
+            anim_setting.anim_froze_frame_idx = -1;
+            anim_setting.trace_grad = 100;
+            anim_setting.frame_action = Anim_Actions.extreme_gold_sword_b_frame;
+            anim_setting.end_action = Anim_Actions.extreme_gold_sword_b_end;
+
+            anim_setting.set_trace(Anim_Traces.trace_gold_sword_b);
+
+            CW_EffectManager.instance.load_as_controller("gold_sword_b_anim", "effects/single_gold_sword/", 10000, 0.2f, anim_setting);
+
+            CW_Asset_Spell spell = new CW_Asset_Spell(
+                id: "extreme_gold_sword_b", anim_id: "gold_sword_b_anim",
+                new CW_Element(new int[] { 0, 0, 0, 100, 0 }), element_type_limit: null,
+                rarity: 295, free_val: 1, cost: 0.8f, min_cost: 1000,
+                learn_level: 10, cast_level: 10, can_get_by_random: true,
+                cultisys_black_or_white_list: true, cultisys_list: null,
+                banned_races: null,
+                target_type: CW_Spell_Target_Type.ACTOR,
+                target_camp: CW_Spell_Target_Camp.ENEMY,
+                triger_type: CW_Spell_Triger_Type.ATTACK,
+                anim_type: CW_Spell_Animation_Type.CUSTOM,
+                damage_action: null,
+                anim_action: null,
+                spell_action: Code.Spell_Actions.extreme_gold_sword_b_spell_action,
+                check_and_cost_action: Cultivation_Way.Actions.CW_SpellAction_Cost.default_check_and_cost
+                );
+            spell.add_tag(CW_Spell_Tag.IMMORTAL);
+            spell.add_tag(CW_Spell_Tag.ATTACK);
+            add_spell(spell);
+        }
         // 飓风领域
         private void extreme_tornado()
         {
@@ -202,11 +241,6 @@ namespace Extreme_Spells.Code
         }
         // 天河之水
         private void extreme_water()
-        {
-            throw new NotImplementedException();
-        }
-        // 金光剑阵
-        private void gold_sword_b()
         {
             throw new NotImplementedException();
         }
