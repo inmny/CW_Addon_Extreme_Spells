@@ -10,6 +10,10 @@ namespace Extreme_Spells.Code
 {
     internal static class Tester
     {
+        private static void default_extreme_gold_sword_a()
+        {
+            force_spell("extreme_gold_sword_a");
+        }
         private static void default_extreme_gold_sword_b()
         {
             force_spell("extreme_gold_sword_b");
