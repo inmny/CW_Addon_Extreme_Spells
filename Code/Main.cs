@@ -75,7 +75,6 @@ namespace Extreme_Spells.Code
         private void add_spells()
         {
             /**
-            gold_sword_a();
 			extreme_water();
 			extreme_tornado();
             */
@@ -83,6 +82,7 @@ namespace Extreme_Spells.Code
             extreme_void();
             extreme_fire();
             extreme_meteorolite();
+            gold_sword_a();
             gold_sword_b();
         }
         // 吞噬天地
@@ -201,10 +201,11 @@ namespace Extreme_Spells.Code
         {
             CW_AnimationSetting anim_setting = new CW_AnimationSetting();
             anim_setting.frame_interval = 1f;
-            anim_setting.loop_limit_type = AnimationLoopLimitType.DST_LIMIT;
+            anim_setting.loop_limit_type = AnimationLoopLimitType.TIME_LIMIT;
+            anim_setting.loop_time_limit = 2f;
             anim_setting.layer_name = "Objects";
             anim_setting.point_to_dst = true;
-            anim_setting.always_point_to_dst = true;
+            //anim_setting.always_point_to_dst = true;
             anim_setting.anim_froze_frame_idx = -1;
             anim_setting.trace_grad = 100;
             anim_setting.frame_action = Anim_Actions.extreme_gold_sword_b_frame;
@@ -234,6 +235,46 @@ namespace Extreme_Spells.Code
             spell.add_tag(CW_Spell_Tag.ATTACK);
             add_spell(spell);
         }
+        // 万剑归宗
+        private void gold_sword_a()
+        {
+            CW_AnimationSetting anim_setting = new CW_AnimationSetting();
+            anim_setting.frame_interval = 0.1f;
+            anim_setting.loop_limit_type = AnimationLoopLimitType.TRACE_LIMIT;
+            anim_setting.loop_trace_limit = 1000f;
+            anim_setting.layer_name = "Objects";
+            anim_setting.point_to_dst = true;
+            anim_setting.always_point_to_dst = true;
+            anim_setting.anim_froze_frame_idx = -1;
+            //anim_setting.froze_time_after_end = 1f;
+            anim_setting.trace_grad = 100;
+            anim_setting.frame_action = Anim_Actions.extreme_gold_sword_a_frame;
+            anim_setting.end_action = Anim_Actions.extreme_gold_sword_a_end;
+
+            anim_setting.set_trace(Anim_Traces.trace_gold_sword_a);
+
+            CW_EffectManager.instance.load_as_controller("gold_sword_a_anim", "effects/single_gold_sword/", 10000, 0.2f, anim_setting);
+
+            CW_Asset_Spell spell = new CW_Asset_Spell(
+                id: "extreme_gold_sword_a", anim_id: "gold_sword_a_anim",
+                new CW_Element(new int[] { 0, 0, 0, 100, 0 }), element_type_limit: null,
+                rarity: 295, free_val: 1, cost: 0.8f, min_cost: 1000,
+                learn_level: 10, cast_level: 10, can_get_by_random: true,
+                cultisys_black_or_white_list: true, cultisys_list: null,
+                banned_races: null,
+                target_type: CW_Spell_Target_Type.ACTOR,
+                target_camp: CW_Spell_Target_Camp.ENEMY,
+                triger_type: CW_Spell_Triger_Type.ATTACK,
+                anim_type: CW_Spell_Animation_Type.CUSTOM,
+                damage_action: null,
+                anim_action: null,
+                spell_action: Code.Spell_Actions.extreme_gold_sword_a_spell_action,
+                check_and_cost_action: Cultivation_Way.Actions.CW_SpellAction_Cost.default_check_and_cost
+                );
+            spell.add_tag(CW_Spell_Tag.IMMORTAL);
+            spell.add_tag(CW_Spell_Tag.ATTACK);
+            add_spell(spell);
+        }
         // 飓风领域
         private void extreme_tornado()
         {
@@ -241,11 +282,6 @@ namespace Extreme_Spells.Code
         }
         // 天河之水
         private void extreme_water()
-        {
-            throw new NotImplementedException();
-        }
-        // 万剑归宗
-        private void gold_sword_a()
         {
             throw new NotImplementedException();
         }

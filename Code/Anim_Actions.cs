@@ -331,8 +331,28 @@ namespace Extreme_Spells.Code
             }
 
         }
+
+        internal static void extreme_gold_sword_a_end(int cur_frame_idx, ref Vector2 src_vec, ref Vector2 dst_vec, CW_SpriteAnimation anim)
+        {
+        }
+
+        internal static void extreme_gold_sword_a_frame(int cur_frame_idx, ref Vector2 src_vec, ref Vector2 dst_vec, CW_SpriteAnimation anim)
+        {
+            WorldTile tile = MapBox.instance.GetTile((int)anim.gameObject.transform.localPosition.x, (int)anim.gameObject.transform.localPosition.y);
+            if (tile == null) return;
+            float damage = anim.cost_for_spell;
+            foreach (CW_Actor unit in tile.units)
+            {
+                if (unit.fast_data.alive && unit != anim.src_object && CW_SpellHelper.is_enemy(unit, anim.src_object))
+                {
+                    unit.get_hit(damage, true, Cultivation_Way.Others.CW_Enums.CW_AttackType.God, anim.src_object, false);
+                }
+            }
+        }
+
         internal static void extreme_gold_sword_b_end(int cur_frame_idx, ref Vector2 src_vec, ref Vector2 dst_vec, CW_SpriteAnimation anim)
         {
+
             WorldTile tile = MapBox.instance.GetTile((int)anim.gameObject.transform.localPosition.x, (int)anim.gameObject.transform.localPosition.y);
             if (tile == null) return;
             //throw new NotImplementedException();
@@ -349,14 +369,26 @@ namespace Extreme_Spells.Code
             {
                 //MapBox.instance.dropManager.spawnBurstPixel(tile, "extreme_gold_drop", 0.2f, Toolbox.randomFloat(0.5f + anim.get_scale().x, anim.get_scale().x), 0);
             }
-            
+        }
+
+        internal static void extreme_gold_sword_b_frame(int cur_frame_idx, ref Vector2 src_vec, ref Vector2 dst_vec, CW_SpriteAnimation anim)
+        {
+            if (Toolbox.Dist(anim.gameObject.transform.localPosition.x, anim.gameObject.transform.localPosition.y, dst_vec.x, dst_vec.y) >= Cultivation_Way.Others.CW_Constants.anim_dst_error) return;
+            anim.play_time += Toolbox.randomFloat(0, 0.05f);
+
+            if (anim.free_val < 1)
+            {
+                anim.free_val = 2;
+                anim.gameObject.transform.localRotation = Quaternion.Euler(0, 0, Toolbox.randomFloat(-120, -60));
+            }
+            WorldTile tile = MapBox.instance.GetTile((int)anim.gameObject.transform.localPosition.x, (int)anim.gameObject.transform.localPosition.y);
             float damage = anim.cost_for_spell * anim.get_scale().x;
             foreach (CW_Actor unit in tile.units)
             {
                 if (unit.fast_data.alive && unit != anim.src_object && CW_SpellHelper.is_enemy(unit, anim.src_object))
                 {
                     unit.get_hit(damage, true, Cultivation_Way.Others.CW_Enums.CW_AttackType.God, anim.src_object, false);
-                    if (unit.fast_data.alive)
+                    if (unit.fast_data.alive&&Toolbox.randomChance(0.017f))
                     {
                         CW_SpriteAnimation new_anim = CW_EffectManager.instance.spawn_anim("gold_sword_b_anim", src_vec, dst_vec, anim.src_object, null, 1);
 
@@ -374,7 +406,7 @@ namespace Extreme_Spells.Code
                     if (unit.fast_data.alive && unit != anim.src_object && CW_SpellHelper.is_enemy(unit, anim.src_object))
                     {
                         unit.get_hit(damage / 3, true, Cultivation_Way.Others.CW_Enums.CW_AttackType.God, anim.src_object, false);
-                        if (unit.fast_data.alive)
+                        if (unit.fast_data.alive && Toolbox.randomChance(0.017f))
                         {
                             CW_SpriteAnimation new_anim = CW_EffectManager.instance.spawn_anim("gold_sword_b_anim", src_vec, dst_vec, anim.src_object, null, 1);
 
@@ -386,11 +418,6 @@ namespace Extreme_Spells.Code
                     }
                 }
             }
-        }
-
-        internal static void extreme_gold_sword_b_frame(int cur_frame_idx, ref Vector2 src_vec, ref Vector2 dst_vec, CW_SpriteAnimation anim)
-        {
-            //throw new NotImplementedException();
         }
 
     }

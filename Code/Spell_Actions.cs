@@ -58,15 +58,56 @@ namespace Extreme_Spells.Code
             //Debug.Log(tiles.Count);
             foreach (WorldTile tile in tiles)
             {
-                //if (Toolbox.randomChance(0.6f)) continue;
+                if (Toolbox.randomChance(0.1f)) continue;
                 int count = (int)(Mathf.Sqrt(radius - Toolbox.DistTile(pTargetTile, tile)));
                 while (count-- > 0)
                 {
-                    CW_SpriteAnimation anim = CW_EffectManager.instance.spawn_anim(spell_asset.anim_id, new Vector3(tile.posV.x, tile.posV.y + Toolbox.randomFloat(10f, 40f)), tile.posV, pUser, null, 1);
+                    float x_offset = Toolbox.randomFloat(-0.5f, 0.5f);
+                    float y_offset = Toolbox.randomFloat(-0.5f, 0.5f);
+                    CW_SpriteAnimation anim = CW_EffectManager.instance.spawn_anim(spell_asset.anim_id, tile.posV+new Vector3(x_offset, Toolbox.randomFloat(10f, 40f)), tile.posV+new Vector3(x_offset, y_offset), pUser, null, 1);
                     if (anim == null) { Debug.Log("Fail to spawn anim"); return; }
 
                     anim.cost_for_spell = radius * radius;
                     anim.cur_frame_idx = 0;
+                }
+            }
+        }
+
+        internal static void extreme_gold_sword_a_spell_action(CW_Asset_Spell spell_asset, BaseSimObject pUser, BaseSimObject pTarget, WorldTile pTargetTile, float cost)
+        {
+            if (pUser == null || !pUser.base_data.alive) return;
+            float radius = Mathf.Log10(cost) * 3;
+            List<WorldTile> tiles = CW_SpellHelper.get_circle_tiles(pTargetTile, radius);
+            //Debug.Log(tiles.Count);
+            List<WorldTile> edge_tiles = new List<WorldTile>();
+            foreach (WorldTile tile in tiles)
+            {
+                //if (Toolbox.randomChance(0.6f)) continue;
+                int count = (int)(radius - Toolbox.DistTile(pTargetTile, tile));
+                if (count != 1) continue;
+
+                edge_tiles.Add(tile);
+
+                Vector3 src_vec = tile.posV;
+                Vector3 dst_vec = 2 * pTargetTile.posV - src_vec;
+
+                CW_SpriteAnimation anim = CW_EffectManager.instance.spawn_anim(spell_asset.anim_id, src_vec, dst_vec, pUser, null, 1);
+                if (anim == null) { Debug.Log("Fail to spawn anim"); return; }
+
+                anim.cost_for_spell = radius * radius;
+                anim.cur_frame_idx = 0;
+                anim.free_val = Toolbox.DistTile(pTargetTile, tile) * 2;
+
+                for (int i = 0; i < 5; i++)
+                {
+                    WorldTile target_tile = edge_tiles.GetRandom(); if (target_tile == tile) break;
+
+                    anim = CW_EffectManager.instance.spawn_anim(spell_asset.anim_id, src_vec, target_tile.posV, pUser, null, 1);
+                    if (anim == null) { Debug.Log("Fail to spawn anim"); return; }
+
+                    anim.cost_for_spell = radius * radius;
+                    anim.cur_frame_idx = 0;
+                    anim.free_val = Toolbox.DistTile(target_tile, tile) * 2;
                 }
             }
         }
