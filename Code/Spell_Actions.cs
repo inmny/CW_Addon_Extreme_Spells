@@ -111,5 +111,37 @@ namespace Extreme_Spells.Code
                 }
             }
         }
+
+        internal static void extreme_tornado_spell_action(CW_Asset_Spell spell_asset, BaseSimObject pUser, BaseSimObject pTarget, WorldTile pTargetTile, float cost)
+        {
+            if (pUser == null || !pUser.base_data.alive) return;
+            float radius = Mathf.Log10(cost) * 3;
+
+            CW_SpriteAnimation anim;
+
+            int i;
+            int count;
+
+            count = (int)(radius);
+            for (i = 0; i < count; i++)
+            {
+                float theta = Toolbox.randomFloat(0, 2*Mathf.PI);
+                Vector2 dst_vec = pTargetTile.posV + new Vector3(Mathf.Cos(theta) * radius, Mathf.Sin(theta) * radius);
+
+                anim = CW_EffectManager.instance.spawn_anim(spell_asset.anim_id, pTargetTile.posV, dst_vec, pUser, null, 1f);
+
+                if (anim == null) { Debug.Log("Fail to spawn anim"); return; }
+
+                anim.cost_for_spell = cost;
+                anim.free_val = Toolbox.randomFloat(0.8f, 3f);
+                anim.change_scale(Toolbox.randomFloat(0.8f, 2.4f));
+            }
+
+
+            anim = CW_EffectManager.instance.spawn_anim(spell_asset.anim_id, pTargetTile.posV, pTargetTile.posV, pUser, null, 3f);
+
+            if (anim == null) { Debug.Log("Fail to spawn anim"); return; }
+            anim.cost_for_spell = cost;
+        }
     }
 }

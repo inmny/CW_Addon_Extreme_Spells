@@ -332,6 +332,35 @@ namespace Extreme_Spells.Code
 
         }
 
+        internal static void extreme_tornado_end(int cur_frame_idx, ref Vector2 src_vec, ref Vector2 dst_vec, CW_SpriteAnimation anim)
+        {
+            //throw new NotImplementedException();
+        }
+
+        internal static void extreme_tornado_frame(int cur_frame_idx, ref Vector2 src_vec, ref Vector2 dst_vec, CW_SpriteAnimation anim)
+        {
+            //throw new NotImplementedException();
+            WorldTile tile = MapBox.instance.GetTile((int)anim.gameObject.transform.localPosition.x, (int)anim.gameObject.transform.localPosition.y);
+            if (tile == null) return;
+
+            float scale = anim.get_scale().x;
+            float damage = anim.cost_for_spell * scale * scale;
+            List<WorldTile> tiles = CW_SpellHelper.get_circle_tiles(tile, (int)(scale * 8));
+            if ((int)(scale * 8) > 10) Debug.Log((int)(scale * 8));
+            List<BaseSimObject> enemies = CW_SpellHelper.find_enemies_in_tiles(tiles, anim.src_object == null ? null : anim.src_object.kingdom);
+
+            foreach(BaseSimObject enemy in enemies)
+            {
+                if (enemy.objectType != MapObjectType.Actor || !enemy.base_data.alive) continue;
+                CW_Actor cw_enemy = (CW_Actor)enemy;
+
+                cw_enemy.addForce(Mathf.Clamp(anim.src_vec.x - enemy.currentPosition.x, - scale * 8, scale * 8) * scale * 0.1f, Mathf.Clamp(anim.src_vec.y - enemy.currentPosition.y, -scale * 8, scale * 8) * scale * 0.1f, scale*4);
+
+                CW_SpellHelper.cause_damage_to_target(anim.src_object, cw_enemy, damage, Cultivation_Way.Others.CW_Enums.CW_AttackType.Spell, true);
+                
+            }
+        }
+
         internal static void extreme_gold_sword_a_end(int cur_frame_idx, ref Vector2 src_vec, ref Vector2 dst_vec, CW_SpriteAnimation anim)
         {
         }

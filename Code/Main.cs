@@ -79,7 +79,7 @@ namespace Extreme_Spells.Code
             */
             extreme_void();
             extreme_fire();
-            //extreme_tornado();
+            extreme_tornado();
             extreme_meteorolite();
             gold_sword_a();
             gold_sword_b();
@@ -95,6 +95,7 @@ namespace Extreme_Spells.Code
             anim_setting.point_to_dst = false;
             anim_setting.anim_froze_frame_idx = -1;
             anim_setting.trace_grad = 20;
+            anim_setting.visible_in_low_res = true;
             anim_setting.frame_action = Anim_Actions.extreme_void_frame;
             anim_setting.end_action = Anim_Actions.extreme_void_end;
             anim_setting.set_trace(AnimationTraceType.NONE);
@@ -134,6 +135,7 @@ namespace Extreme_Spells.Code
             anim_setting.point_to_dst = false;
             anim_setting.anim_froze_frame_idx = -1;
             anim_setting.trace_grad = 100;
+            anim_setting.visible_in_low_res = true;
             anim_setting.frame_action = Anim_Actions.extreme_meteorolite_frame;
             anim_setting.end_action = Anim_Actions.extreme_meteorolite_end;
             anim_setting.set_trace(AnimationTraceType.TRACK);
@@ -170,6 +172,7 @@ namespace Extreme_Spells.Code
             anim_setting.point_to_dst = false;
             anim_setting.anim_froze_frame_idx = -1;
             anim_setting.trace_grad = 15;
+            anim_setting.visible_in_low_res = true;
             anim_setting.frame_action = Anim_Actions.extreme_fire_frame;
             anim_setting.end_action = Anim_Actions.extreme_fire_end;
             anim_setting.set_trace(AnimationTraceType.TRACK);
@@ -207,6 +210,7 @@ namespace Extreme_Spells.Code
             //anim_setting.always_point_to_dst = true;
             anim_setting.anim_froze_frame_idx = -1;
             anim_setting.trace_grad = 100;
+            anim_setting.visible_in_low_res = true;
             anim_setting.frame_action = Anim_Actions.extreme_gold_sword_b_frame;
             anim_setting.end_action = Anim_Actions.extreme_gold_sword_b_end;
 
@@ -247,6 +251,7 @@ namespace Extreme_Spells.Code
             anim_setting.anim_froze_frame_idx = -1;
             //anim_setting.froze_time_after_end = 1f;
             anim_setting.trace_grad = 100;
+            anim_setting.visible_in_low_res = true;
             anim_setting.frame_action = Anim_Actions.extreme_gold_sword_a_frame;
             anim_setting.end_action = Anim_Actions.extreme_gold_sword_a_end;
 
@@ -277,7 +282,41 @@ namespace Extreme_Spells.Code
         // 飓风领域
         private void extreme_tornado()
         {
-            throw new NotImplementedException();
+            CW_AnimationSetting anim_setting = new CW_AnimationSetting();
+            anim_setting.frame_interval = 0.05f;
+            anim_setting.loop_limit_type = AnimationLoopLimitType.TIME_LIMIT;
+            anim_setting.loop_time_limit = 30f;
+            anim_setting.layer_name = "Objects";
+            anim_setting.anim_froze_frame_idx = -1;
+            //anim_setting.froze_time_after_end = 1f;
+            anim_setting.trace_grad = 20;
+            anim_setting.visible_in_low_res = true;
+            anim_setting.frame_action = Anim_Actions.extreme_tornado_frame;
+            anim_setting.end_action = Anim_Actions.extreme_tornado_end;
+
+            anim_setting.set_trace(Anim_Traces.trace_extreme_tornado);
+
+            CW_EffectManager.instance.load_as_controller("extreme_tornado_anim", "effects/simple_tornado/", 1000, 0.25f, anim_setting);
+
+            CW_Asset_Spell spell = new CW_Asset_Spell(
+                id: "extreme_tornado", anim_id: "extreme_tornado_anim",
+                new CW_Element(new int[] { 40, 40, 20, 0, 0 }), element_type_limit: null,
+                rarity: 295, free_val: 1, cost: 0.8f, min_cost: 1000,
+                learn_level: 10, cast_level: 10, can_get_by_random: true,
+                cultisys_black_or_white_list: true, cultisys_list: null,
+                banned_races: null,
+                target_type: CW_Spell_Target_Type.ACTOR,
+                target_camp: CW_Spell_Target_Camp.ENEMY,
+                triger_type: CW_Spell_Triger_Type.ATTACK,
+                anim_type: CW_Spell_Animation_Type.CUSTOM,
+                damage_action: null,
+                anim_action: null,
+                spell_action: Code.Spell_Actions.extreme_tornado_spell_action,
+                check_and_cost_action: Cultivation_Way.Actions.CW_SpellAction_Cost.default_check_and_cost
+                );
+            spell.add_tag(CW_Spell_Tag.IMMORTAL);
+            spell.add_tag(CW_Spell_Tag.ATTACK);
+            add_spell(spell);
         }
         // 天河之水
         private void extreme_water()
