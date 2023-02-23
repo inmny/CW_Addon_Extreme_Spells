@@ -98,7 +98,7 @@ namespace Extreme_Spells.Code
                 anim.cur_frame_idx = 0;
                 anim.free_val = Toolbox.DistTile(pTargetTile, tile) * 2;
 
-                for (int i = 0; i < 5; i++)
+                for (int i = 0; i < 9; i++)
                 {
                     WorldTile target_tile = edge_tiles.GetRandom(); if (target_tile == tile) break;
 
@@ -107,7 +107,7 @@ namespace Extreme_Spells.Code
 
                     anim.cost_for_spell = radius * radius;
                     anim.cur_frame_idx = 0;
-                    anim.free_val = Toolbox.DistTile(target_tile, tile) * 2;
+                    anim.free_val = Toolbox.randomFloat(0.8f,3f);
                 }
             }
         }

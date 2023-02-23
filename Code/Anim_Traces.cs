@@ -37,7 +37,7 @@ namespace Extreme_Spells.Code
 
             CW_AnimationSetting setting = anim.get_setting(false);
 
-            float trace_grad = setting.trace_grad * 10 / (10 + cur_to_dst_dist) * Toolbox.randomFloat(0.3f,1.5f) / cur_to_dst_dist;
+            float trace_grad = setting.trace_grad * 10 / (10 + cur_to_dst_dist) * anim.free_val / cur_to_dst_dist;
 
 
             delta_x = (dst_vec.x - anim.gameObject.transform.localPosition.x) * trace_grad;
@@ -50,6 +50,7 @@ namespace Extreme_Spells.Code
                 delta_y = (dst_vec.y - anim.gameObject.transform.localPosition.y) / anim.cur_elapsed;
 
                 //anim.trace_length = 0;
+                anim.free_val = Toolbox.randomFloat(0.8f, 3f);
                 (dst_vec, src_vec) = (src_vec, dst_vec);
             }
 

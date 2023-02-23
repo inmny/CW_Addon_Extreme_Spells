@@ -76,11 +76,10 @@ namespace Extreme_Spells.Code
         {
             /**
 			extreme_water();
-			extreme_tornado();
             */
-
             extreme_void();
             extreme_fire();
+            //extreme_tornado();
             extreme_meteorolite();
             gold_sword_a();
             gold_sword_b();
@@ -241,7 +240,7 @@ namespace Extreme_Spells.Code
             CW_AnimationSetting anim_setting = new CW_AnimationSetting();
             anim_setting.frame_interval = 0.1f;
             anim_setting.loop_limit_type = AnimationLoopLimitType.TRACE_LIMIT;
-            anim_setting.loop_trace_limit = 1000f;
+            anim_setting.loop_trace_limit = 1500f;
             anim_setting.layer_name = "Objects";
             anim_setting.point_to_dst = true;
             anim_setting.always_point_to_dst = true;

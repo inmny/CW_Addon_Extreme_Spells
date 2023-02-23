@@ -10,6 +10,17 @@ namespace Extreme_Spells.Code
 {
     internal static class Tester
     {
+        private static void test_all()
+        {
+            foreach(CW_Asset_Spell spell in CW_Library_Manager.instance.spells.list)
+            {
+                try
+                {
+                    force_spell(spell.id);
+                }
+                catch (Exception) { UnityEngine.Debug.Log($"Error in {spell.id}"); continue; }
+            }
+        }
         private static void default_extreme_gold_sword_a()
         {
             force_spell("extreme_gold_sword_a");
