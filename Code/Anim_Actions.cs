@@ -14,6 +14,7 @@ namespace Extreme_Spells.Code
     internal static class Anim_Actions
     {
         private static TerraformOptions tmp_terraform_options;
+        private static TerraformOptions remove_water;
         public static void extreme_void_frame(int cur_frame_idx, ref Vector2 src_vec, ref Vector2 dst_vec, CW_SpriteAnimation anim)
         {
             if (cur_frame_idx == 17) anim.cur_frame_idx = 6;
@@ -49,8 +50,8 @@ namespace Extreme_Spells.Code
                 CW_MapChunk chunk = tile.get_cw_chunk();
                 if(Toolbox.randomChance(0.01f))MapAction.terraformMain(tile, TileLibrary.pit_deep_ocean, TerraformLibrary.destroy_no_flash);
                 if (chunk == null) continue;
-                anim.end_froze_time += CW_Utils_Others.get_raw_wakan(chunk.wakan * 0.05f, chunk.wakan_level);
-                chunk.wakan *= 0.95f;
+                anim.end_froze_time += CW_Utils_Others.get_raw_wakan(chunk.wakan * 0.001f, chunk.wakan_level);
+                chunk.wakan *= 0.999f;
                 chunk.update(true);
             }
             Cultivation_Way.World_Data.instance.map_chunk_manager.force_update_mapmode();
@@ -66,7 +67,7 @@ namespace Extreme_Spells.Code
             }
             CW_Actor actor = (CW_Actor)anim.src_object;
             actor.cw_status.wakan += CW_Utils_Others.compress_raw_wakan(anim.end_froze_time, actor.cw_status.wakan_level);
-            Debug.Log(CW_Utils_Others.compress_raw_wakan(anim.end_froze_time, actor.cw_status.wakan_level));
+            //Debug.Log(CW_Utils_Others.compress_raw_wakan(anim.end_froze_time, actor.cw_status.wakan_level));
             for(int i=0;i<20;i++)actor.check_level_up();
         }
 
@@ -106,7 +107,7 @@ namespace Extreme_Spells.Code
 
                     tile.delayedBombType = _tmp_actor.fast_data.actorID;
 
-                    chunk.wakan *= 0.8f;
+                    chunk.wakan *= 0.999f;
 
                     if (chunk.wakan < 1) chunk.wakan = 0;
                 }
@@ -136,6 +137,83 @@ namespace Extreme_Spells.Code
                 }
 
             }
+        }
+        internal static void extreme_lightning_frame(int cur_frame_idx, ref Vector2 src_vec, ref Vector2 dst_vec, CW_SpriteAnimation anim)
+        {
+            //throw new NotImplementedException();
+            if (cur_frame_idx != 5) return;
+            List<WorldTile> tiles = new List<WorldTile>();
+
+            List<Vector2> src_list = new List<Vector2>();
+            int i;
+            float scale = anim.get_scale().x;
+
+            Vector2Int delta = new Vector2Int((int)((dst_vec.x - src_vec.x) * scale * 5), (int)((dst_vec.y - src_vec.y) * scale * 5));
+
+            Vector2 crude_dir = new Vector2(Mathf.Sign(delta.x), Mathf.Sign(delta.y));
+
+            for (i = -(int)(scale * 4); i < (int)(scale * 4); i++)
+            {
+                src_list.Add(src_vec + i*crude_dir);
+            }
+
+            int dx = Math.Abs(delta.x);
+            int dy = Math.Abs(delta.y);
+            float k = delta.y / (float)delta.x;
+
+            Vector2 tmp_vec = new Vector2(0, 0);
+            WorldTile tmp_tile;
+            foreach (Vector2 cur_src in src_list)
+            {
+                float b = -k * cur_src.x + cur_src.y;
+                for (i = 0; i < dx; i++)
+                {
+                    tmp_vec.x = cur_src.x + i * crude_dir.x;
+                    tmp_vec.y = k * tmp_vec.x + b;
+                    tmp_tile = MapBox.instance.GetTile((int)tmp_vec.x, (int)tmp_vec.y);
+                    if (tmp_tile == null) continue;
+                    tiles.Add(tmp_tile);
+                }
+                for (i = 0; i < dy; i++)
+                {
+                    tmp_vec.y = cur_src.y + i * crude_dir.y;
+                    tmp_vec.x = (tmp_vec.y - cur_src.y) / k + cur_src.x;
+                    tmp_tile = MapBox.instance.GetTile((int)tmp_vec.x, (int)tmp_vec.y);
+                    if (tmp_tile == null) continue;
+                    tiles.Add(tmp_tile);
+                }
+            }
+
+            foreach(WorldTile tile in tiles) { MapAction.removeLiquid(tile); tile.setBurned(); }
+
+            List<BaseSimObject> enemies = CW_SpellHelper.find_enemies_in_tiles(tiles, anim.src_object == null ? null : anim.src_object.kingdom);
+            foreach(BaseSimObject enemy in enemies)
+            {
+                if (!enemy.base_data.alive) continue;
+                CW_SpellHelper.cause_damage_to_target(anim.src_object, enemy, anim.cost_for_spell);
+            }
+
+            tmp_tile = MapBox.instance.GetTile((int)anim.src_vec.x, (int)anim.src_vec.y);
+            if (tmp_tile != null)
+            {
+                enemies = CW_SpellHelper.find_enemies_in_circle(tmp_tile, anim.src_object == null ? null : anim.src_object.kingdom, (int)(scale * 8));
+                foreach (BaseSimObject enemy in enemies)
+                {
+                    if (!enemy.base_data.alive) continue;
+                    CW_SpellHelper.cause_damage_to_target(anim.src_object, enemy, anim.cost_for_spell);
+                }
+            }
+            anim.free_val = Toolbox.randomFloat(0.8f, 3f);
+            float radius = Toolbox.DistVec2Float(src_vec, dst_vec);
+            float theta = Toolbox.randomFloat(0, 2 * Mathf.PI);
+            dst_vec.x = src_vec.x + Mathf.Cos(theta) * radius;
+            dst_vec.y = src_vec.y + Mathf.Sin(theta) * radius;
+            anim.renderer.flipX = Toolbox.randomBool();
+        }
+
+        internal static void extreme_lightning_end(int cur_frame_idx, ref Vector2 src_vec, ref Vector2 dst_vec, CW_SpriteAnimation anim)
+        {
+            //throw new NotImplementedException();
         }
 
         internal static void extreme_meteorolite_frame(int cur_frame_idx, ref Vector2 src_vec, ref Vector2 dst_vec, CW_SpriteAnimation anim)
@@ -346,7 +424,6 @@ namespace Extreme_Spells.Code
             float scale = anim.get_scale().x;
             float damage = anim.cost_for_spell * scale * scale;
             List<WorldTile> tiles = CW_SpellHelper.get_circle_tiles(tile, (int)(scale * 8));
-            if ((int)(scale * 8) > 10) Debug.Log((int)(scale * 8));
             List<BaseSimObject> enemies = CW_SpellHelper.find_enemies_in_tiles(tiles, anim.src_object == null ? null : anim.src_object.kingdom);
 
             foreach(BaseSimObject enemy in enemies)

@@ -108,5 +108,6 @@ namespace Extreme_Spells.Code
 
             return;
         }
+        internal static void trace_no_action(ref Vector2 src_vec, ref Vector2 dst_vec, CW_SpriteAnimation anim, ref float delta_x, ref float delta_y) { return; }
     }
 }

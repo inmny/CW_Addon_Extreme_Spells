@@ -21,6 +21,10 @@ namespace Extreme_Spells.Code
                 catch (Exception) { UnityEngine.Debug.Log($"Error in {spell.id}"); continue; }
             }
         }
+        private static void default_extreme_lightning()
+        {
+            force_spell("extreme_lightning");
+        }
         private static void default_extreme_tornado()
         {
             force_spell("extreme_tornado");

@@ -81,8 +81,50 @@ namespace Extreme_Spells.Code
             extreme_fire();
             extreme_tornado();
             extreme_meteorolite();
+            extreme_lightning();
             gold_sword_a();
             gold_sword_b();
+        }
+        // 雷泽
+        private void extreme_lightning()
+        {
+            CW_AnimationSetting anim_setting = new CW_AnimationSetting();
+            anim_setting.frame_interval = 0.05f;
+            anim_setting.loop_limit_type = AnimationLoopLimitType.TIME_LIMIT;
+            anim_setting.loop_time_limit = 15f;
+            anim_setting.layer_name = "Objects";
+            anim_setting.anim_froze_frame_idx = -1;
+            //anim_setting.froze_time_after_end = 1f;
+            anim_setting.trace_grad = 20;
+            anim_setting.point_to_dst = true;
+            anim_setting.always_point_to_dst = true;
+            anim_setting.visible_in_low_res = true;
+            anim_setting.frame_action = Anim_Actions.extreme_lightning_frame;
+            anim_setting.end_action = Anim_Actions.extreme_lightning_end;
+
+            anim_setting.set_trace(Anim_Traces.trace_no_action);
+
+            CW_EffectManager.instance.load_as_controller("extreme_lightning_anim", "effects/default_lightning/", 1000, 0.25f, anim_setting);
+
+            CW_Asset_Spell spell = new CW_Asset_Spell(
+                id: "extreme_lightning", anim_id: "extreme_lightning_anim",
+                new CW_Element(new int[] { 40, 40, 0, 20, 0 }), element_type_limit: null,
+                rarity: 295, free_val: 1, cost: 0.8f, min_cost: 1000,
+                learn_level: 10, cast_level: 10, can_get_by_random: true,
+                cultisys_black_or_white_list: true, cultisys_list: null,
+                banned_races: null,
+                target_type: CW_Spell_Target_Type.ACTOR,
+                target_camp: CW_Spell_Target_Camp.ENEMY,
+                triger_type: CW_Spell_Triger_Type.ATTACK,
+                anim_type: CW_Spell_Animation_Type.CUSTOM,
+                damage_action: null,
+                anim_action: null,
+                spell_action: Code.Spell_Actions.extreme_lightning_spell_action,
+                check_and_cost_action: Cultivation_Way.Actions.CW_SpellAction_Cost.default_check_and_cost
+                );
+            spell.add_tag(CW_Spell_Tag.IMMORTAL);
+            spell.add_tag(CW_Spell_Tag.ATTACK);
+            add_spell(spell);
         }
         // 吞噬天地
         private void extreme_void()
@@ -285,7 +327,7 @@ namespace Extreme_Spells.Code
             CW_AnimationSetting anim_setting = new CW_AnimationSetting();
             anim_setting.frame_interval = 0.05f;
             anim_setting.loop_limit_type = AnimationLoopLimitType.TIME_LIMIT;
-            anim_setting.loop_time_limit = 30f;
+            anim_setting.loop_time_limit = 15f;
             anim_setting.layer_name = "Objects";
             anim_setting.anim_froze_frame_idx = -1;
             //anim_setting.froze_time_after_end = 1f;
