@@ -5,5 +5,7 @@
 	"spell_extreme_void": "吞噬天地",
 	"spell_extreme_meteorolite": "地爆天星",
 	"spell_extreme_tornado": "飓风领域",
-	"spell_extreme_lightning": "雷泽"
+	"spell_extreme_lightning": "雷泽",
+	"extreme_spell_destroy_map_title": "超级法术破坏地图",
+	"extreme_spell_destroy_map_description": "禁用此项后，超级法术不会严重破坏地图"
 }

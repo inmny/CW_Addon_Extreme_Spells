@@ -35,7 +35,9 @@ namespace Extreme_Spells.Code
         internal BaseEffectController bomb_controller;
         internal Dictionary<string, Pair<CW_Actor, int>> tmp_actors;
         internal static Addon_Main_Class instance;
-		public override void awake(){
+        internal string destroy_world_law_id = "extreme_spell_destroy_map";
+
+        public override void awake(){
 			// 不要在此处添加代码，除非你知道你在做什么
 			// DO NOT code here.
 			load_mod_info(System.Type.GetType("Mod"));
@@ -66,6 +68,13 @@ namespace Extreme_Spells.Code
             bomb_controller = (BaseEffectController)stack_effects.CallMethod("get", "explosionSmall");
 
             tmp_actors = new Dictionary<string, Pair<CW_Actor, int>>();
+
+            add_laws();
+        }
+
+        private void add_laws()
+        {
+            Cultivation_Way.Content.W_Content_WorldLaws.add_law(destroy_world_law_id, true, $"icon_{destroy_world_law_id}", Cultivation_Way.Content.CW_WorldLaw_Type.Others);
         }
 
         public override void update(float elapsed)

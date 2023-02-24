@@ -14,7 +14,6 @@ namespace Extreme_Spells.Code
     internal static class Anim_Actions
     {
         private static TerraformOptions tmp_terraform_options;
-        private static TerraformOptions remove_water;
         public static void extreme_void_frame(int cur_frame_idx, ref Vector2 src_vec, ref Vector2 dst_vec, CW_SpriteAnimation anim)
         {
             if (cur_frame_idx == 17) anim.cur_frame_idx = 6;
@@ -48,7 +47,7 @@ namespace Extreme_Spells.Code
             foreach(WorldTile tile in tiles)
             {
                 CW_MapChunk chunk = tile.get_cw_chunk();
-                if(Toolbox.randomChance(0.01f))MapAction.terraformMain(tile, TileLibrary.pit_deep_ocean, TerraformLibrary.destroy_no_flash);
+                if(Cultivation_Way.Content.W_Content_WorldLaws.is_law_enable(Addon_Main_Class.instance.destroy_world_law_id) && Toolbox.randomChance(0.01f))MapAction.terraformMain(tile, TileLibrary.pit_deep_ocean, TerraformLibrary.destroy_no_flash);
                 if (chunk == null) continue;
                 anim.end_froze_time += CW_Utils_Others.get_raw_wakan(chunk.wakan * 0.001f, chunk.wakan_level);
                 chunk.wakan *= 0.999f;
@@ -61,10 +60,14 @@ namespace Extreme_Spells.Code
             WorldTile center = MapBox.instance.GetTile((int)src_vec.x, (int)src_vec.y);
             if (center == null || anim.src_object == null || !anim.src_object.base_data.alive) return;
             List<WorldTile> tiles = CW_SpellHelper.get_circle_tiles(center, (int)(Mathf.Log10(anim.cost_for_spell / 1000) * 12));
-            foreach(WorldTile tile in tiles)
+            if (Cultivation_Way.Content.W_Content_WorldLaws.is_law_enable(Addon_Main_Class.instance.destroy_world_law_id))
             {
-                MapAction.terraformMain(tile, TileLibrary.pit_deep_ocean, TerraformLibrary.destroy_no_flash);
+                foreach(WorldTile tile in tiles)
+                {
+                    MapAction.terraformMain(tile, TileLibrary.pit_deep_ocean, TerraformLibrary.destroy_no_flash);
+                }
             }
+            
             CW_Actor actor = (CW_Actor)anim.src_object;
             actor.cw_status.wakan += CW_Utils_Others.compress_raw_wakan(anim.end_froze_time, actor.cw_status.wakan_level);
             //Debug.Log(CW_Utils_Others.compress_raw_wakan(anim.end_froze_time, actor.cw_status.wakan_level));
@@ -96,7 +99,7 @@ namespace Extreme_Spells.Code
 
                 foreach (WorldTile tile in tiles)
                 {
-                    MapAction.terraformMain(tile, TileLibrary.pit_deep_ocean, TerraformLibrary.destroy_no_flash);
+                    if(Cultivation_Way.Content.W_Content_WorldLaws.is_law_enable(Addon_Main_Class.instance.destroy_world_law_id)) MapAction.terraformMain(tile, TileLibrary.pit_deep_ocean, TerraformLibrary.destroy_no_flash);
 
                     chunk = tile.get_cw_chunk();
                     if (chunk.wakan <= 0) { count.Value--; continue; }
