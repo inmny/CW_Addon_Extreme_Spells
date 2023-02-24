@@ -40,7 +40,7 @@ namespace Extreme_Spells.Code
         public override void awake(){
 			// 不要在此处添加代码，除非你知道你在做什么
 			// DO NOT code here.
-			load_mod_info(System.Type.GetType("Mod"));
+			load_mod_info(System.Type.GetType("Mod"), "1.0.5");
 		}
 		public override void initialize(){
 			Log("添加超级法术!");
@@ -119,7 +119,7 @@ namespace Extreme_Spells.Code
                 id: "extreme_lightning", anim_id: "extreme_lightning_anim",
                 new CW_Element(new int[] { 40, 40, 0, 20, 0 }), element_type_limit: null,
                 rarity: 295, free_val: 1, cost: 0.8f, min_cost: 1000,
-                learn_level: 10, cast_level: 10, can_get_by_random: true,
+                learn_level: 10, cast_level: 10, can_get_by_random: true, can_store_in_book:false,
                 cultisys_black_or_white_list: true, cultisys_list: null,
                 banned_races: null,
                 target_type: CW_Spell_Target_Type.ACTOR,
@@ -156,7 +156,7 @@ namespace Extreme_Spells.Code
                 id: "extreme_void", anim_id: "extreme_void_anim",
                 new CW_Element(new int[] { 20, 20, 20, 20, 20 }), element_type_limit: null,
                 rarity: 295, free_val: 1, cost: 0.98f, min_cost: 1000,
-                learn_level: 10, cast_level: 10, can_get_by_random: true,
+                learn_level: 10, cast_level: 10, can_get_by_random: true, can_store_in_book: false,
                 cultisys_black_or_white_list: true, cultisys_list: null,
                 banned_races: null,
                 target_type: CW_Spell_Target_Type.ACTOR,
@@ -196,7 +196,7 @@ namespace Extreme_Spells.Code
                 id: "extreme_meteorolite", anim_id: "extreme_meteorolite_anim",
                 new CW_Element(new int[] { 0, 50, 0, 0, 50 }), element_type_limit: null,
                 rarity: 295, free_val: 1, cost: 0.8f, min_cost: 1000,
-                learn_level: 10, cast_level: 10, can_get_by_random: true,
+                learn_level: 10, cast_level: 10, can_get_by_random: true, can_store_in_book: false,
                 cultisys_black_or_white_list: true, cultisys_list: null,
                 banned_races: null,
                 target_type: CW_Spell_Target_Type.ACTOR,
@@ -233,7 +233,7 @@ namespace Extreme_Spells.Code
                 id: "extreme_fire", anim_id: "extreme_fire_anim",
                 new CW_Element(new int[] { 0, 100, 0, 0, 0 }), element_type_limit: null,
                 rarity: 295, free_val: 1, cost: 0.8f, min_cost: 1000,
-                learn_level: 10, cast_level: 10, can_get_by_random: true,
+                learn_level: 10, cast_level: 10, can_get_by_random: true, can_store_in_book: false,
                 cultisys_black_or_white_list: true, cultisys_list: null,
                 banned_races: null,
                 target_type: CW_Spell_Target_Type.ACTOR,
@@ -273,7 +273,7 @@ namespace Extreme_Spells.Code
                 id: "extreme_gold_sword_b", anim_id: "gold_sword_b_anim",
                 new CW_Element(new int[] { 0, 0, 0, 100, 0 }), element_type_limit: null,
                 rarity: 295, free_val: 1, cost: 0.8f, min_cost: 1000,
-                learn_level: 10, cast_level: 10, can_get_by_random: true,
+                learn_level: 10, cast_level: 10, can_get_by_random: true, can_store_in_book: false,
                 cultisys_black_or_white_list: true, cultisys_list: null,
                 banned_races: null,
                 target_type: CW_Spell_Target_Type.ACTOR,
@@ -314,7 +314,7 @@ namespace Extreme_Spells.Code
                 id: "extreme_gold_sword_a", anim_id: "gold_sword_a_anim",
                 new CW_Element(new int[] { 0, 0, 0, 100, 0 }), element_type_limit: null,
                 rarity: 295, free_val: 1, cost: 0.8f, min_cost: 1000,
-                learn_level: 10, cast_level: 10, can_get_by_random: true,
+                learn_level: 10, cast_level: 10, can_get_by_random: true, can_store_in_book: false,
                 cultisys_black_or_white_list: true, cultisys_list: null,
                 banned_races: null,
                 target_type: CW_Spell_Target_Type.ACTOR,
@@ -353,7 +353,7 @@ namespace Extreme_Spells.Code
                 id: "extreme_tornado", anim_id: "extreme_tornado_anim",
                 new CW_Element(new int[] { 40, 40, 20, 0, 0 }), element_type_limit: null,
                 rarity: 295, free_val: 1, cost: 0.8f, min_cost: 1000,
-                learn_level: 10, cast_level: 10, can_get_by_random: true,
+                learn_level: 10, cast_level: 10, can_get_by_random: true, can_store_in_book: false,
                 cultisys_black_or_white_list: true, cultisys_list: null,
                 banned_races: null,
                 target_type: CW_Spell_Target_Type.ACTOR,
