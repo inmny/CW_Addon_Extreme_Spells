@@ -7,12 +7,5 @@
 	"spell_extreme_tornado": "飓风领域",
 	"spell_extreme_lightning": "雷泽",
 	"extreme_spell_destroy_map_title": "超级法术破坏地图",
-	"extreme_spell_destroy_map_description": "禁用此项后，超级法术不会严重破坏地图",
-	"log_extreme_gold_sword_a_cast": "万剑归宗",
-	"log_extreme_gold_sword_b_cast": "金光剑雨",
-	"log_extreme_fire_cast": "天火焚世",
-	"log_extreme_void_cast": "吞噬天地",
-	"log_extreme_meteorolite_cast": "地爆天星",
-	"log_extreme_tornado_cast": "飓风领域",
-	"log_extreme_lightning_cast": "雷泽"
+	"extreme_spell_destroy_map_description": "禁用此项后，超级法术不会严重破坏地图"
 }

@@ -19,7 +19,7 @@ namespace Extreme_Spells.Code
             CW_SpriteAnimation anim = CW_EffectManager.instance.spawn_anim(spell_asset.anim_id, pTargetTile, pTargetTile, pUser, pTarget, Mathf.Log10(cost / 1000));
             if (anim == null) return;
             anim.cost_for_spell = cost;
-            WorldLogMessage message = new WorldLogMessage($"log_{spell_asset.id}_cast");
+            WorldLogMessage message = new WorldLogMessage($"spell_{spell_asset.id}");
             message.unit = (Actor)pUser;
             message.icon = "iconTornado";
             message.location = pTargetTile.posV3;
@@ -34,7 +34,7 @@ namespace Extreme_Spells.Code
             anim.cost_for_spell = cost;
             anim.set_alpha(0);
             anim.set_position(pTargetTile.posV + new Vector3(50, 100));
-            WorldLogMessage message = new WorldLogMessage($"log_{spell_asset.id}_cast");
+            WorldLogMessage message = new WorldLogMessage($"spell_{spell_asset.id}");
             message.unit = (Actor)pUser;
             message.icon = "iconTornado";
             message.location = pTargetTile.posV3;
@@ -59,7 +59,7 @@ namespace Extreme_Spells.Code
                 //anim.set_position(tile.posV + new Vector3(0, 50));
                 //Debug.Log(anim.gameObject.transform.localPosition);
             }
-            WorldLogMessage message = new WorldLogMessage($"log_{spell_asset.id}_cast");
+            WorldLogMessage message = new WorldLogMessage($"spell_{spell_asset.id}");
             message.unit = (Actor)pUser;
             message.icon = "iconTornado";
             message.location = pTargetTile.posV3;
@@ -87,7 +87,7 @@ namespace Extreme_Spells.Code
                     anim.cur_frame_idx = 0;
                 }
             }
-            WorldLogMessage message = new WorldLogMessage($"log_{spell_asset.id}_cast");
+            WorldLogMessage message = new WorldLogMessage($"spell_{spell_asset.id}");
             message.unit = (Actor)pUser;
             message.icon = "iconTornado";
             message.location = pTargetTile.posV3;
@@ -130,7 +130,7 @@ namespace Extreme_Spells.Code
                     anim.cur_frame_idx = 0;
                     anim.free_val = Toolbox.randomFloat(0.8f,3f);
                 }
-                WorldLogMessage message = new WorldLogMessage($"log_{spell_asset.id}_cast");
+                WorldLogMessage message = new WorldLogMessage($"spell_{spell_asset.id}");
                 message.unit = (Actor)pUser;
                 message.icon = "iconTornado";
                 message.location = pTargetTile.posV3;
@@ -169,7 +169,7 @@ namespace Extreme_Spells.Code
 
             if (anim == null) { Debug.Log("Fail to spawn anim"); return; }
             anim.cost_for_spell = cost;
-            WorldLogMessage message = new WorldLogMessage($"log_{spell_asset.id}_cast");
+            WorldLogMessage message = new WorldLogMessage($"spell_{spell_asset.id}");
             message.unit = (Actor)pUser;
             message.icon = "iconTornado";
             message.location = pTargetTile.posV3;
@@ -206,7 +206,7 @@ namespace Extreme_Spells.Code
 
             if (anim == null) { Debug.Log("Fail to spawn anim"); return; }
             anim.cost_for_spell = cost;
-            WorldLogMessage message = new WorldLogMessage($"log_{spell_asset.id}_cast");
+            WorldLogMessage message = new WorldLogMessage($"spell_{spell_asset.id}");
             message.unit = (Actor)pUser;
             message.icon = "iconTornado";
             message.location = pTargetTile.posV3;
